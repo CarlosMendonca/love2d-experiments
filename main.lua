@@ -1,82 +1,48 @@
-require('typo')
-
-local ship_rotation, ship_x, ship_y
-local ship_x0 = 100
-local ship_y0 = 100
-local ship_width = 100
-local ship_height = 100
-
 function love.load()
-    love.keyboard.setKeyRepeat(true)
+    love.physics.setMeter(4) -- B2 wingspan is 172 feet, or 52-ish meters; these ships are 14 pixels tall, so say that 1 meter equals 4 pixels
+    world = love.physics.newWorld(0, 0, 400, 240)
 
-    star_map = {}
-    ship_rotation = 0
-    ship_x = 0
-    ship_y = 0
+    objects = {}
+    
+    objects.ship1 = {}
+    objects.ship1.body = love.physics.newBody(world, 10, 10, "dynamic")
+    objects.ship1.shape = love.physics.newRectangleShape(0, 0, 11, 14)
+    objects.ship1.fixture = love.physics.newFixture(objects.ship1.body, objects.ship1.shape, 59) -- around 59 tons for B2
+    objects.ship1.sprite = love.graphics.newImage("sprites/ship_player2.png")
 
-    typo_new("Hello, World", 0.5, 500, 'center', 0, 0, love.graphics.newFont(30), { 255, 255, 255 })
+    objects.ship2 = {}
+    objects.ship2.body = love.physics.newBody(world, 390, 130, "dynamic")
+    objects.ship2.shape = love.physics.newRectangleShape(0, 0, 11, 14)
+    objects.ship2.fixture = love.physics.newFixture(objects.ship2.body, objects.ship2.shape, 59)
+
+    love.graphics.setBackgroundColor(0, 0, 0)
+    love.window.setMode(400, 240)
 end
 
 function love.update(dt)
-    typo_update(dt)
+    world:update(dt)
+
+    if love.keyboard.isDown("right") then
+        objects.ship1.body:applyForce(100000, 0)
+    elseif love.keyboard.isDown("left") then
+        objects.ship1.body:applyForce(-100000, 0)
+    elseif love.keyboard.isDown("space") then
+        objects.ship1.body:setPosition(10, 10)
+        objects.ship1.body:setLinearVelocity(0, 0)
+    end
 end
 
 function love.draw()
-    --drawStarMap()
-    --drawTriangle()
+    love.graphics.setColor(1, 1, 1)
+    --love.graphics.draw(objects.ship1.sprite, 100, 100)
 
-    love.graphics.print("Hello World", 400, 300)
-    typo_draw()
+    print(objects.ship1.shape:getPoints())
+    print(objects.ship1.body:getWorldPoints(objects.ship1.shape:getPoints()))
+
+    --love.graphics.draw(objects.ship1.sprite, objects.ship1.body:getWorldPoints(objects.ship1.shape:getPoints()))
+    love.graphics.polygon("fill", objects.ship1.body:getWorldPoints(objects.ship1.shape:getPoints()))
 end
 
-function love.keypressed(key, isrepeat)
-
-    generateStarMap()
-    if key == 'q' then
-        ship_rotation = ship_rotation + 0.1
-    elseif key == 'e' then
-        ship_rotation = ship_rotation - 0.1
-    elseif key == 'w' then
-        ship_y = ship_y + 10
-    elseif key == 's' then
-        ship_y = ship_y - 10
-    elseif key == 'a' then
-        ship_x = ship_x + 10
-    elseif key == 'd' then
-        ship_x = ship_x - 10
-    end
-end
-
-function drawStarMap()
-    for i, star in ipairs(star_map) do
-        love.graphics.points(star[1], star[2])
-    end
-end
-
-function generateStarMap()
-    local screen_width, screen_height = love.graphics.getDimensions()
-    local max_stars = 1500
-
-    for i=1, max_stars do
-        local x = love.math.random(1, screen_width-1)
-        local y = love.math.random(1, screen_height-1)
-        star_map[i] = {x, y}
-    end
-end
-
-function drawTriangle()
-    ship_center_x = ship_x0 + ship_x + ship_width/2;
-    ship_center_y = ship_y0 + ship_y + ship_height/2;
-
-    love.graphics.push()
-	love.graphics.translate(ship_center_x,ship_center_y)    -- rotation center
-	love.graphics.rotate(ship_rotation)                     -- rotate
-	love.graphics.translate(-ship_center_x,-ship_center_y)  -- move back
-    love.graphics.polygon('line',
-        ship_x + 100, ship_y + 100,
-        ship_x + 200, ship_y + 100,
-        ship_x + 150, ship_y + 200)
-	love.graphics.pop()
-
-	love.graphics.polygon('fill', 200, 200, 300, 200, 250, 300)
+function love.conf(t)
+    t.console = true
 end
