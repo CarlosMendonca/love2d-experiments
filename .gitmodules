@@ -1,0 +1,3 @@
+[submodule "third_party/Concord"]
+	path = third_party/Concord
+	url = https://github.com/Tjakka5/Concord.git
