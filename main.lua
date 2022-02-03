@@ -54,6 +54,7 @@ local Concord = require('libraries/concord')
         local keyRightPressed = love.keyboard.isDown("right")
 
         local VELOCITY_INCREMENT = 5
+        -- TODO: maybe add some de-bounce or a world:emit keypressed
 
         for _, e in ipairs(self.pool) do
             if keyUpPressed then
@@ -98,13 +99,13 @@ local Concord = require('libraries/concord')
 local ship_player1 = Concord.entity(world)
 :give("position", 100, 100)
 :give("velocity", 10, 0)
-:give("sprite", 'sprites/ship_player2.png')
+:give("sprite", 'sprites/ship2_player1.png')
 
 local ship_player2 = Concord.entity(world)
 :give("position", 50, 50)
 :give("velocity")
 :give("input")
-:give("sprite", 'sprites/ship_player2.png')
+:give("sprite", 'sprites/ship2_player2.png')
 
 local e3 = Concord.entity(world)
 :give("position", 200, 200)
